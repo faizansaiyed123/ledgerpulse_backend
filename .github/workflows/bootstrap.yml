@@ -21,10 +21,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .bootstrap/*.b64 > /tmp/repository.tgz.b64
-          base64 -d /tmp/repository.tgz.b64 > /tmp/repository.tgz
+          cat .bootstrap/*.b64 > /tmp/repository.tgz.xz.b64
+          base64 -d /tmp/repository.tgz.xz.b64 > /tmp/repository.tgz.xz
           mkdir -p /tmp/extracted
-          tar -xzf /tmp/repository.tgz -C /tmp/extracted
+          tar -xJf /tmp/repository.tgz.xz -C /tmp/extracted
 
           find . -mindepth 1 -maxdepth 1 \
             ! -name .git \
