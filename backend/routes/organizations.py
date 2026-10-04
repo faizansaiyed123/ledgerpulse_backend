@@ -268,8 +268,12 @@ def accept_invitation(org_id):
     member = OrganizationMember.query.filter_by(org_id=org_id, invitation_token_hash=token_hash, status="invited").with_for_update().first()
     if not member:
         return jsonify({"error": "Invitation not found or already accepted"}), 404
-    if member.invitation_expires_at and member.invitation_expires_at < datetime.now(timezone.utc):
-        return jsonify({"error": "Invitation has expired"}), 410
+    if member.invitation_expires_at:
+        expires_at = member.invitation_expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if expires_at < datetime.now(timezone.utc):
+            return jsonify({"error": "Invitation has expired"}), 410
     if member.user_email.lower() != user.get("email", "").lower():
         return jsonify({"error": "Sign in with the invited email address"}), 403
 
