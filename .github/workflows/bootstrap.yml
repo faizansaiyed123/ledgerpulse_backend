@@ -1,4 +1,4 @@
-name: Bootstrap repository
+name: Restore final LedgerPulse source
 
 on:
   push:
@@ -8,16 +8,28 @@ permissions:
   contents: write
 
 jobs:
-  test:
+  restore:
+    if: ${{ hashFiles('.bootstrap/payload-*.b64') != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Test repository write access
+        with:
+          fetch-depth: 0
+      - name: Restore source
+        shell: bash
         run: |
-          set -e
-          echo "write-test" > bootstrap-write-test.txt
+          set -euo pipefail
+          mkdir -p /tmp/ledgerpulse
+          cat .bootstrap/payload-*.b64 > /tmp/ledgerpulse/source.tar.xz.b64
+          base64 -d /tmp/ledgerpulse/source.tar.xz.b64 > /tmp/ledgerpulse/source.tar.xz
+          mkdir -p /tmp/ledgerpulse/extracted
+          tar -xJf /tmp/ledgerpulse/source.tar.xz -C /tmp/ledgerpulse/extracted
+          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name .github ! -name .bootstrap -exec rm -rf {} +
+          cp -a /tmp/ledgerpulse/extracted/. .
+          rm -rf .bootstrap
+          git rm -f bootstrap-write-test.txt 2>/dev/null || true
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add bootstrap-write-test.txt
-          git commit -m "test: verify repository write access"
+          git add -A
+          git commit -m "feat: publish completed LedgerPulse application" || exit 0
           git push origin HEAD:main
