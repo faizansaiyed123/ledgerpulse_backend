@@ -1,15 +1,11 @@
 name: Publish validated source
-
 on:
   push:
     branches: [main]
-
 permissions:
   contents: write
-
 jobs:
   publish:
-    if: ${{ hashFiles('.bootstrap/01.b64') != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
