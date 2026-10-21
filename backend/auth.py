@@ -8,7 +8,7 @@ from backend.models import Organization, OrganizationMember
 try:
     import firebase_admin
     from firebase_admin import auth as firebase_auth, credentials
-except ImportError:  # pragma: no cover - dependency installed in normal runtime
+except ImportError:  
     firebase_admin = None
     firebase_auth = None
     credentials = None

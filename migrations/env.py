@@ -3,7 +3,7 @@ from logging.config import fileConfig
 from alembic import context
 from backend.app import app
 from backend.database import db
-from backend import models  # noqa: F401
+from backend import models  
 
 config = context.config
 if config.config_file_name:
