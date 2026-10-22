@@ -22,10 +22,17 @@ def health_check():
 @platform_admin_required
 def health_details():
     try:
-        version = db.session.execute(text("SELECT version();")).scalar()
+        engine = db.session.get_bind()
+        dialect = engine.dialect.name
+        if dialect == "postgresql":
+            version = db.session.execute(text("SELECT version();")).scalar()
+            database_name = "PostgreSQL"
+        else:
+            version = db.session.execute(text("SELECT sqlite_version();")).scalar()
+            database_name = dialect.upper()
         return jsonify({
             "status": "healthy",
-            "database": "PostgreSQL",
+            "database": database_name,
             "postgres_version": version,
             "connected": True,
             "stats": {
