@@ -291,8 +291,9 @@ def test_roles_invitations_tenant_security_and_platform_diagnostics(client):
     assert client.get(f"/api/organizations/{other_org}", headers=owner_headers).status_code == 403
     assert client.get("/api/admin/overview", headers=auth_headers("regular")).status_code == 403
     assert client.get("/api/health/details", headers=auth_headers("regular")).status_code == 403
-    assert client.get("/api/admin/overview", headers=owner_headers).status_code == 200
-    assert client.get("/api/health/details", headers=owner_headers).status_code == 200
+    platform_headers = auth_headers("platform-user", "platform@example.test", "Platform Admin")
+    assert client.get("/api/admin/overview", headers=platform_headers).status_code == 200
+    assert client.get("/api/health/details", headers=platform_headers).status_code == 200
 
     assert client.post(
         f"/api/organizations/{org_id}/sample-data",
