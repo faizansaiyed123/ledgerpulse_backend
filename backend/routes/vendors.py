@@ -34,6 +34,15 @@ def get_vendors():
     return jsonify([vendor.to_dict() for vendor in vendors]), 200
 
 
+@vendor_bp.route("/vendors/<id>", methods=["GET"])
+@require_auth
+def get_vendor(id):
+    vendor, _org, error = _authorized_vendor(id)
+    if error:
+        return error
+    return jsonify(vendor.to_dict()), 200
+
+
 @vendor_bp.route("/vendors", methods=["POST"])
 @require_auth
 def create_vendor():
